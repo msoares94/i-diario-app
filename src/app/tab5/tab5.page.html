@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-title >Usuário</ion-title>
+  
+  </ion-toolbar>
+</ion-header>
+<ion-content fullscreen class="ion-padding">
+  <div class="details-panel">
+    <div class="detail">
+      <h3 class="detail-title">Nome</h3>
+      <p class="detail-text">{{ this.user_full_name }}</p>
+    </div>
+
+    <div class="detail">
+      <h3 class="detail-title">E-mail</h3>
+      <p class="detail-text">{{ this.user_email }}</p>
+    </div>
+  </div>
+
+  <h3 class="content-page-section">Dados úteis</h3>
+  <div class="details-panel">
+    <div class="detail">
+      <h3 class="detail-title">Versão do aplicativo</h3>
+      <p class="detail-text">{{app_version}}</p>
+    </div>
+
+    <div class="detail">
+      <h3 class="detail-title">Sistema operacional</h3>
+     
+      <p class="detail-text">{{ this.device.platform }} {{ this.device.version }}</p>
+    </div>
+
+    <div class="detail">
+      <h3 class="detail-title">Marca e modelo</h3>
+     
+      <p class="detail-text">{{ this.device.manufacturer }} {{ this.device.model }}</p>
+    </div>
+  </div>
+  <ion-button class="button-exit" expand="full" (click)="logout()">Sair</ion-button>
+  <br>
+  <br>
+  <br>  <br>
+</ion-content>

@@ -1,0 +1,42 @@
+<ion-content class="login-background" padding>
+  <div class="background-content">
+    <h2 class="saudacao">{{ greetingText() }}</h2>
+    <ion-grid class="form-errors" *ngIf="anyError">
+      <ion-row>
+        <ion-col class="form-errors-content">
+          <ion-icon name="close"></ion-icon>
+          <p>{{ errorMessage }} <b>Verifique os dados e tente novamente.</b></p>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+    <form class="form-login" #f="ngForm">
+      <ion-list>
+        <ion-item class="inputs">
+          <ion-select class="select-city" (ionChange)="updateSupportUrl()" [(ngModel)]="selectedCity" placeholder="Município" name="serverUrl" id="serverUrl" required >
+            <ion-select-option *ngFor="let city of cities" [value]="city">
+              {{ city.name }}
+            </ion-select-option>
+          </ion-select>
+        </ion-item>
+
+        <ion-item class="inputs">
+          <!-- Adicionamos o ngModel para vincular o valor do input a uma propriedade do componente -->
+          <ion-input [(ngModel)]="credentials" type="text" placeholder="Email ou CPF" name="credential" id="credential"
+            required></ion-input>
+        </ion-item>
+
+        <ion-item class="inputs">
+          <!-- Adicionamos o ngModel para vincular o valor do input a uma propriedade do componente -->
+          <ion-input [(ngModel)]="password" type="password" name="password" id="password" placeholder="Senha"
+            required></ion-input>
+        </ion-item>
+      </ion-list>
+
+      <ion-button class="button-login" expand="block" (click)="loginForm(f)">Entrar</ion-button>
+    </form>
+    <h3 class="contato">
+      Você não lembra o acesso?<br>
+      <a *ngIf="supportUrl" (click)="openSupportUrl()">Entre em contato.</a>
+    </h3>
+  </div>
+</ion-content>

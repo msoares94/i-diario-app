@@ -1,9 +1,7 @@
 {
-  "name": "app_offline",
+  "name": "i-diario-ap-v2",
   "integrations": {
-    "cordova": {}
+    "capacitor": {}
   },
-  "type": "ionic-angular",
-  "id": "***REMOVED***",
-  "app_id": ""
+  "type": "angular"
 }

@@ -1,0 +1,17 @@
+.empty-results {
+    width: auto;
+    height: 60pt;
+    background-color: #E5DEEC;
+    border-radius: 5pt;
+    margin: 10px;
+    padding: 16px;
+    text-align: center;
+
+    .texto {
+        font-family: "NunitoBold";
+        font-size: 14pt;
+        color: #87878c;
+        text-align: center;
+        padding-top: 14pt;
+    }
+}

@@ -1,0 +1,19 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-title >Planos de ensino</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="doRefresh()">
+        <ion-icon slot="icon-only" name="sync"></ion-icon>
+      </ion-button>
+      <ion-button (click)="newFrequency()">
+        <ion-icon slot="icon-only" name="add"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-content" padding>
+  <div *ngIf="emptyFrequencies" class="empty-results">
+    <p>Nenhum plano de ensino foi encontrado.</p>
+  </div>
+</ion-content>
