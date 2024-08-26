@@ -10,6 +10,7 @@ import { UtilsService } from '../services/utils';
 import { Router } from '@angular/router';
 import { User } from '../data/user.interface';
 import { Customer } from '../data/customer.interface';
+import { OfflineDataPersisterService } from '../services/offline_data_persistence/offline_data_persister';
 
 @Component({
   selector: 'app-sign-in',
@@ -41,6 +42,7 @@ export class SignInPage implements OnInit {
     private messages: MessagesService,
     private cdr: ChangeDetectorRef,
     private router: Router,
+    private offlineDataPersister: OfflineDataPersisterService
   ) { }
 
   ngOnInit(): void {
@@ -96,6 +98,10 @@ export class SignInPage implements OnInit {
       (user: User) => {
         console.log(user);
         this.auth.setCurrentUser(user);
+        this.offlineDataPersister.persist(user).subscribe(res => {
+          console.log(res);
+        })
+
         this.router.navigate([''], { queryParams: user });
       },
       (error: any) => {

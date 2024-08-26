@@ -18,7 +18,7 @@ export class StudentsService {
     return request.pipe(
       map((response: any) => {
         return {
-          data: response.json(),
+          data: response,
           classroomId: classroomId,
           disciplineId: disciplineId
         };

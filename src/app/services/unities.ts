@@ -11,13 +11,14 @@ export class UnitiesService {
     private http: HttpClient,
     private storage: Storage,
     private api: ApiService
-  ) {}
+  ) {} 
 
   getOnlineUnities(teacherId: number): Observable<any> {
     const request = this.http.get(this.api.getTeacherUnitiesUrl(), { params: { teacher_id: teacherId } });
     return request.pipe(
       map((response: any) => {
-        return response.json();
+       // console.log(response)
+        return response;
       })
     );
   }

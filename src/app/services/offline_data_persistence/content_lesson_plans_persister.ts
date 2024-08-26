@@ -18,6 +18,7 @@ export class ContentLessonPlansPersisterService{
     return new Observable((observer) => {
       this.contentLessonPlansService.getContentLessonPlans(user.teacher_id).subscribe(
         (contentLessonPlans: { [x: string]: any; }) => {
+          console.log(contentLessonPlans)
           observer.next(this.storage.set('contentLessonPlans', contentLessonPlans['lesson_plans']||[]))
         },
         (error: any) => {

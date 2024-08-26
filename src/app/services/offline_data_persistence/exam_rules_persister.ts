@@ -17,7 +17,7 @@ export class ExamRulesPersisterService {
   persist(user: any, classrooms: any[]): Observable<any> {
     return new Observable(observer => {
       const examRulesObservables = classrooms.flatMap(classroomList =>
-        classroomList.data.map((classroom: { id: number; }) =>
+        classroomList.map((classroom: { id: number; }) =>
           this.examRules.getOnlineExamRules(user.teacher_id, classroom.id)
         )
       );

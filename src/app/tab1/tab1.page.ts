@@ -1,11 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { NavController } from '@ionic/angular';
-
-import { Storage } from '@ionic/storage-angular';
+import { LoadingController, NavController } from '@ionic/angular';
 import { AuthService } from '../services/auth';
 import { Router } from '@angular/router';
 import { UtilsService } from '../services/utils';
 import { SyncProvider } from '../services/sync';
+import { MessagesService } from '../services/messages';
+import { OfflineDataPersisterService } from '../services/offline_data_persistence/offline_data_persister';
+import { DailyFrequencyService } from '../services/daily_frequency';
+import { StorageService } from '../services/storage.service';
 
 
 @Component({
@@ -14,32 +16,28 @@ import { SyncProvider } from '../services/sync';
   styleUrls: ['tab1.page.scss']
 })
 export class Tab1Page implements OnInit {
-  shownGroup: string | null = null;
-  lastFrequencyDays: any[] | null = null;
-  emptyFrequencies = false;
-  currentDate: Date | null = null;
-  frequenciesLoaded = false;
+  shownGroup: any = null;
+  lastFrequencyDays: any = null;
+  emptyFrequencies: boolean = false;
+  currentDate: Date = new Date();
+  frequenciesLoaded: boolean = false;
+  private loadingSync!: HTMLIonLoadingElement;
 
   constructor(
-    private navCtrl: NavController,
-    private auth: AuthService,
-    private storage: Storage,
     private router: Router,
+    private sync: SyncProvider,
+    private loadingCtrl: LoadingController,
+    private dailyFrequencyService: DailyFrequencyService,
+    private auth: AuthService,
     private utilsService: UtilsService,
-    private sync: SyncProvider
-
-  ) { }
+    private storage: StorageService,
+    private messages: MessagesService
+  ) {}
 
   async ngOnInit() {
-    await this.auth.currentUser().subscribe(res => {
-      console.log(res);
-      if (!res) {
-        this.router.navigate(['/sign-in']);
-      }
-    })
-    await this.utilsService.viewIsLeaving().subscribe(async isLeaving => {
+    this.utilsService.viewIsLeaving().subscribe(isLeaving => {
       if (isLeaving) {
-        await this.loadFrequencies();
+        this.loadFrequencies();
         this.frequenciesLoaded = true;
       }
     });
@@ -48,77 +46,77 @@ export class Tab1Page implements OnInit {
   }
 
   ionViewWillEnter() {
-    if (
-      !this.frequenciesLoaded &&
-      (!this.currentDate //||
-        // this.navCtrl.last()['component']['name'] == 'FrequencyPage' ||
-        // this.navCtrl.last()['component']['name'] == 'StudentsFrequencyPage'
-      )
-    ) {
+    if (!this.frequenciesLoaded && (!this.currentDate || this.router.url.includes('frequency'))) {
       this.loadFrequencies();
     }
     this.frequenciesLoaded = false;
   }
 
-  async loadFrequencies() {
+  loadFrequencies() {  
     this.shownGroup = null;
     this.currentDate = this.utilsService.getCurrentDate();
     this.currentDate.setHours(0, 0, 0, 0);
-    const frequencies = await this.storage.get('frequencies');
-    if (frequencies) {
-      // this.lastFrequencyDays = this.lastTenFrequencies(frequencies.daily_frequencies);
-      this.emptyFrequencies = false;
-    } else {
-      this.emptyFrequencies = true;
-      this.currentDate = null;
-    }
-    this.emptyFrequencies = true;
+    this.storage.get('frequencies').then((frequencies) => {
+      if (frequencies) {
+        this.lastFrequencyDays = this.lastTenFrequencies(frequencies.daily_frequencies);
+        this.emptyFrequencies = false;
+      } else {
+        this.emptyFrequencies = true;
+       // this.currentDate = undefined;
+      }
+    });
   }
 
-  async newFrequency() {
-    /*const available = await this.utilsService.hasAvailableStorage();
-    if (!available) {
-      this.messages.showError(this.messages.insuficientStorageErrorMessage('lançar novas frequências'));
-      return;
-    }
-    const unities = await this.storage.get('unities');
-    this.navCtrl.navigateForward(['FrequencyPage'], { queryParams: { unities: unities } });*/
+  newFrequency() {
+    this.utilsService.hasAvailableStorage().then((available) => {
+      if (!available) {
+        this.messages.showError(this.messages.insuficientStorageErrorMessage('lançar novas frequências'));
+        return;
+      }
+      this.storage.get('unities').then((unities) => {
+        console.log(unities)
+        this.router.navigate(['/frequency']);
+      });
+    });
   }
 
-  toggleGroup(group: string) {
+  toggleGroup(group: any) {
     this.shownGroup = this.isGroupShown(group) ? null : group;
   }
 
-  isGroupShown(group: string) {
+  isGroupShown(group: any) {
     return this.shownGroup === group;
   }
 
   private lastTenFrequencies(frequencies: any[]) {
-  /*  const lastDays = [];
+    const lastDays = [];
     const frequencyLimit = 10;
+
     for (let i = frequencyLimit; i > 0; i--) {
-      // const shortDate = this.utilsService.toStringWithoutTime(this.currentDate);
-      // const frequenciesOfDay = this.frequenciesOfDay(frequencies, shortDate);
+      const shortDate = this.utilsService.toStringWithoutTime(this.currentDate);
+      const frequenciesOfDay = this.frequenciesOfDay(frequencies, shortDate);
+
       lastDays.push({
-        // date: shortDate,
-        // format_date: this.utilsService.toExtensiveFormat(this.currentDate),
-        // exists: frequenciesOfDay.length > 0,
+        date: shortDate,
+        format_date: this.utilsService.toExtensiveFormat(this.currentDate),
+        exists: frequenciesOfDay.length > 0,
         unities: this.unitiesOfFrequency(frequenciesOfDay)
       });
-      // this.currentDate.setDate(this.currentDate.getDate() - 1);
+      this.currentDate.setDate(this.currentDate.getDate() - 1);
     }
-    return lastDays;*/
+
+    return lastDays;
   }
 
   private frequenciesOfDay(frequencies: any[], date: string) {
-    return frequencies.filter((frequency) => frequency.frequency_date == date);
+    return frequencies.filter(frequency => frequency.frequency_date === date);
   }
 
   unitiesOfFrequency(frequencies: any[]) {
-   /* if (!frequencies) return null;
-    let unities = [];
+    if (!frequencies) return null;
+    const unities: { id: any; name: any; classroomDisciplines: any[]; }[] = [];
     frequencies.forEach(frequency => {
-      if (unities.filter((unity) => unity.id == frequency.unity_id).length == 0) {
+      if (unities.findIndex(unity => unity.id === frequency.unity_id) === -1) {
         unities.push({
           id: frequency.unity_id,
           name: frequency.unity_name,
@@ -126,21 +124,102 @@ export class Tab1Page implements OnInit {
         });
       }
     });
-    return unities;*/
+    return unities;
   }
 
+  classroomDisciplinesOfUnityFrequency(frequencies: any[], unityId: number) {
+    const frequenciesOfUnity = frequencies.filter(frequency => frequency.unity_id === unityId);
+    const classroomDisciplines: {
+      classroomId: any;
+      disciplineId: any;
+      classroomName: any;
+      disciplineName: any; classNumbers: any[]; 
+}[] = [];
+
+    frequenciesOfUnity.forEach(frequency => {
+      const indexOfClassroomDiscipline = classroomDisciplines.findIndex(cd => cd.classroomId === frequency.classroom_id && cd.disciplineId === frequency.discipline_id);
+
+      if (indexOfClassroomDiscipline < 0) {
+        classroomDisciplines.push({
+          classroomId: frequency.classroom_id,
+          classroomName: frequency.classroom_name,
+          disciplineId: frequency.discipline_id,
+          disciplineName: frequency.discipline_name,
+          classNumbers: frequency.class_number ? [frequency.class_number] : []
+        });
+      } else if (frequency.class_number) {
+        classroomDisciplines[indexOfClassroomDiscipline].classNumbers.push(frequency.class_number);
+      }
+    });
+
+    return classroomDisciplines.sort((cd1, cd2) => {
+      const desc1 = this.utilsService.comparableString(cd1.classroomName + cd1.disciplineName);
+      const desc2 = this.utilsService.comparableString(cd2.classroomName + cd2.disciplineName);
+      return desc1 > desc2 ? 1 : desc2 > desc1 ? -1 : 0;
+    });
+  }
 
   loadMoreFrequencies() {
-    console.log('o q isso faz?');
+    this.utilsService.hasAvailableStorage().then(async (available) => {
+      if (!available) {
+        this.messages.showError(this.messages.insuficientStorageErrorMessage('carregar mais frequências'));
+        return;
+      }
+      this.loadingSync = await this.loadingCtrl.create({
+        message: "Carregando..."
+      });
+      this.loadingSync.present();
+      this.storage.get('frequencies').then((frequencies) => {
+        console.log(frequencies)
+        if (frequencies) {
+          
+          // Verifica se this.lastFrequencyDays está inicializado
+          if (!this.lastFrequencyDays) {
+            this.lastFrequencyDays = [];
+          }
+          // Concatena apenas se houver frequências
+          const newFrequencies = this.lastTenFrequencies(frequencies.daily_frequencies);
+          if (newFrequencies.length > 0) {
+            this.lastFrequencyDays = this.lastFrequencyDays.concat(newFrequencies);
+          }
+        }
+        this.loadingSync.dismiss();
+      });
+    });
   }
+  
+
+  async editFrequency(unityId: number, classroomId: number, stringDate: string, disciplineId: number, classes: number[]) {
+    const globalAbsence = !disciplineId;
+    this.loadingSync = await this.loadingCtrl.create({
+      message: "Carregando..."
+    });
+    this.loadingSync.present();
+
+    this.auth.currentUser().subscribe((user: { id: any; teacher_id: any; }) => {
+      this.dailyFrequencyService.getStudents({
+        userId: user.id,
+        teacherId: user.teacher_id,
+        unityId: unityId,
+        classroomId: classroomId,
+        frequencyDate: stringDate,
+        disciplineId: disciplineId,
+        classNumbers: classes ? classes.join() : ''
+      }).subscribe(
+        (result: any) => {
+          this.router.navigate(['/students-frequency-edit', { frequencies: result, global: globalAbsence }]);
+        },
+        (error: any) => {
+          console.log(error);
+        },
+        () => {
+          this.loadingSync.dismiss();
+        }
+      );
+    });
+  }
+
   doRefresh() {
-
-  }
-
-  editFrequency(um: any, dois: any, tres: any, quatro: any, cinco: any) {
-    console.log(um);
-    console.log(dois);
-
-
+    this.sync.syncAll().subscribe(() => this.loadFrequencies());
   }
 }

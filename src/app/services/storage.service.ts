@@ -14,6 +14,7 @@ export class StorageService {
     const store = new Storage();
     await store.create();
     this._storage = store;
+    //console.log(this._storage)
   }
   public set(key: string, value: any) {
 

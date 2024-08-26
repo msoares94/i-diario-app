@@ -17,7 +17,7 @@ export class GlobalFrequenciesPersisterService {
     return from(this.storage.get('examRules')).pipe(
       concatMap(examRule => {
         const frequenciesObservables = classrooms.flatMap(classroomList =>
-          classroomList.data.map((classroom: { id: number; }) => {
+          classroomList.map((classroom: { id: number; }) => {
             const currentExamRule = examRule.find((rule: any) => rule.classroomId === classroom.id);
             if (currentExamRule && currentExamRule.data.exam_rule.frequency_type === "1") {
               return this.frequencies.getFrequencies(classroom.id, 0, user.teacher_id);

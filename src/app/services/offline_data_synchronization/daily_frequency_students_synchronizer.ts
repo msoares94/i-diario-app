@@ -16,8 +16,10 @@ export class DailyFrequencyStudentsSynchronizer {
   ) {}
 
   public sync(dailyFrequencyStudents: any[]): Observable<any> {
+    console.log(dailyFrequencyStudents)
     return new Observable(observer => {
       if (dailyFrequencyStudents) {
+        
         this.auth.currentUser().pipe(
           concatMap(user => {
             const requests = dailyFrequencyStudents.map(dailyFrequencyStudent => {
@@ -38,7 +40,9 @@ export class DailyFrequencyStudentsSynchronizer {
           result => observer.next(result),
           error => observer.error(error),
           () => {
-            this.deleteFrequencies(dailyFrequencyStudents);
+            //this.deleteFrequencies(dailyFrequencyStudents);
+            let freq: never[] = [];
+            this.storage.set('dailyFrequencyStudentsToSync', freq);
             observer.complete();
           }
         );
@@ -46,11 +50,12 @@ export class DailyFrequencyStudentsSynchronizer {
         observer.complete();
       }
     });
-  }
+  } 
 
   private deleteFrequencies(dailyFrequencyStudents: any[]) {
     from(this.storage.get('dailyFrequencyStudentsToSync')).subscribe(localDailyFrequencyStudents => {
-      const newDailyFrequencyStudents = localDailyFrequencyStudents.filter((localDailyFrequencyStudent: any) => {
+      console.log(localDailyFrequencyStudents);
+      const newDailyFrequencyStudents = localDailyFrequencyStudents.filter((localDailyFrequencyStudent: any)  => {
         return !dailyFrequencyStudents.some((dailyFrequencyStudent: any) =>
           this.isSameDailyFrequencyStudent(dailyFrequencyStudent, localDailyFrequencyStudent)
         );

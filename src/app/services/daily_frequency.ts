@@ -267,7 +267,7 @@ export class DailyFrequencyService {
 
     return this.http.get<any>(this.api.getDailyFrequencyUrl(), { params }).pipe(
       map(response => ({
-        data: response.json(),
+        data: response,
         classroomId,
         disciplineId,
         teacherId

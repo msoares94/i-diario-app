@@ -17,7 +17,24 @@ const routes: Routes = [
   {
     path: 'tab5',
     loadChildren: () => import('./tab5/tab5.module').then( m => m.Tab5PageModule)
+  },
+  {
+    path: 'teaching-plan-details',
+    loadChildren: () => import('./teaching-plan-details/teaching-plan-details.module').then( m => m.TeachingPlanDetailsPageModule)
+  },
+  {
+    path: 'teaching-plan-details/:id',
+    loadChildren: () => import('./teaching-plan-details/teaching-plan-details.module').then( m => m.TeachingPlanDetailsPageModule)
+  },
+  {
+    path: 'frequency',
+    loadChildren: () => import('./frequency/frequency.module').then( m => m.FrequencyPageModule)
+  },
+  {
+    path: 'new-content-record-form',
+    loadChildren: () => import('./new-content-record-form/new-content-record-form.module').then( m => m.NewContentRecordFormPageModule)
   }
+  
 ];
 @NgModule({
   imports: [

@@ -18,7 +18,7 @@
   </div>
 
   <h3 class="content-page-section">Dados úteis</h3>
-  <div class="details-panel">
+  <div class="details-panel" *ngIf="carregou">
     <div class="detail">
       <h3 class="detail-title">Versão do aplicativo</h3>
       <p class="detail-text">{{app_version}}</p>
@@ -27,7 +27,7 @@
     <div class="detail">
       <h3 class="detail-title">Sistema operacional</h3>
      
-      <p class="detail-text">{{ this.device.platform }} {{ this.device.version }}</p>
+      <p class="detail-text">{{ this.device.operatingSystem }} {{ this.device.osVersion }}</p>
     </div>
 
     <div class="detail">

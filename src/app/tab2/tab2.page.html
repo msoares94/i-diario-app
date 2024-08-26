@@ -1,11 +1,11 @@
 <ion-header>
   <ion-toolbar mode="md">
-    <ion-title >Conteúdos de Aula</ion-title>
+    <ion-title>Conteúdos de aula</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="doRefresh()">
         <ion-icon slot="icon-only" name="sync"></ion-icon>
       </ion-button>
-      <ion-button (click)="newFrequency()">
+      <ion-button (click)="newContentRecordForm()">
         <ion-icon slot="icon-only" name="add"></ion-icon>
       </ion-button>
     </ion-buttons>
@@ -13,7 +13,36 @@
 </ion-header>
 
 <ion-content class="page-content" padding>
-  <div *ngIf="emptyFrequencies" class="empty-results">
-    <p>Nenhuma conteúdo encontrado.</p>
+  <div class="content-space">
+    <div *ngFor="let contentDay of contentDays; let i = index">
+      <h3 class="content-day">{{ contentDay.format_date }}</h3>
+      <div class="accordion-list-border">
+        <ion-list class="accordion-list" *ngFor="let unity of contentDay.unities; let y = index">
+          <ion-item class="accordion-list-header" lines="none" text-wrap (click)="toggleGroup(i + '' + y)"
+            [class.active]="isGroupShown(i + '' + y)">
+            <p>{{ unity.name }}</p>
+          </ion-item>
+
+          <ion-item *ngIf="isGroupShown(i + '' + y)" class="accordion-list-item accordion-list-new-content-record">
+            <ion-button expand="block" fill="clear" (click)="newContentRecordForm(contentDay.date, unity.id)">
+              <ion-icon slot="start" name="add-circle-outline"></ion-icon> Adicionar novo conteúdo
+            </ion-button>
+          </ion-item>
+
+          <div *ngFor="let unityItem of unity.unityItems;">
+            <ion-item *ngIf="isGroupShown(i + '' + y)"
+              (click)="openContentRecordForm(contentDay.date, unity.id, unityItem.discipline_id, unityItem.classroom_id, unityItem.grade_id, unityItem.description, unityItem.classroom_name, unity.name)"
+              class="accordion-list-item accordion-list-content-record-index">
+              <p>{{ unityItem.description }} - {{ unityItem.classroom_name }}</p>
+              <ion-note slot="end">{{ unityItem.contents.length }}/{{ unityItem.uniqueContents.length }}</ion-note>
+            </ion-item>
+          </div>
+        </ion-list>
+      </div>
+    </div>
+
+    <div *ngIf="!contentDays.length" class="empty-results">
+      <p>Nenhum conteúdo encontrado.</p>
+    </div>
   </div>
 </ion-content>

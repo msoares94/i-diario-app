@@ -34,6 +34,7 @@ export class SchoolCalendarsService {
         }
 
         schoolCalendars.forEach((schoolCalendar: any) => {
+          console.log(schoolCalendar)
           if (schoolCalendar.unityId == unityId) {
             observer.next(schoolCalendar);
             observer.complete();

@@ -20,7 +20,7 @@ export class DisciplinesPersisterService {
   persist(user: any, classrooms: any[]): Observable<any> {
     return new Observable(observer => {
       const classroomObservables = classrooms.flatMap(classroomList =>
-        classroomList.data.map((classroom: { id: number; }) =>
+        classroomList.map((classroom: { id: number; }) =>
           this.disciplines.getOnlineDisciplines(user.teacher_id, classroom.id)
         )
       );

@@ -1,0 +1,74 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-title>Novo conteúdo</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="goBack()">
+        <ion-icon name="close"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content class="page-content" padding>
+  <form #f="ngForm" (ngSubmit)="submitNewContentRecord(f)">
+    <div class="form-frequency">
+
+      <!-- Escolha da Escola -->
+      <div class="form-item" *ngIf="unities && unities.length > 0">
+        <h3 class="form-item-title">Qual a escola?</h3>
+        <ion-list>
+          <ion-radio-group [(ngModel)]="unityId" name="unity" required (ionChange)="onChangeUnity()">
+            <ion-item *ngFor="let unity of unities">
+              <ion-label>{{ unity.description }}</ion-label>
+              <ion-radio slot="start" [value]="unity.id"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+      </div>
+
+      <!-- Mensagem de Escolas Vazia -->
+      <div *ngIf="emptyUnities" class="empty-results">
+        <p margin>Nenhuma escola encontrada.</p>
+      </div>
+
+      <!-- Escolha da Turma -->
+      <div class="form-item" *ngIf="classrooms && classrooms.length > 0">
+        <h3 class="form-item-title">Turma</h3>
+        <ion-list>
+          <ion-radio-group [(ngModel)]="classroomId" name="classroom" required (ionChange)="onChangeClassroom()">
+            <ion-item *ngFor="let classroom of classrooms">
+              <ion-label>{{ classroom.description }}</ion-label>
+              <ion-radio slot="start" [value]="classroom.id"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+      </div>
+
+      <!-- Escolha da Disciplina -->
+      <div class="form-item" *ngIf="disciplines && disciplines.length > 0">
+        <h3 class="form-item-title">Disciplina</h3>
+        <ion-list>
+          <ion-radio-group [(ngModel)]="disciplineId" name="discipline" required>
+            <ion-item *ngFor="let discipline of disciplines">
+              <ion-label>{{ discipline.description }}</ion-label>
+              <ion-radio slot="start" [value]="discipline.id"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+      </div>
+
+      <!-- Escolha da Data -->
+      <div class="form-item" *ngIf="classrooms && classrooms.length > 0">
+        <h3 class="form-item-title">Data</h3>
+        <ion-item>
+          <ion-datetime display-format="DD/MM/YYYY" [(ngModel)]="date" name="date"></ion-datetime>
+        </ion-item>
+      </div>
+
+      <!-- Botão de Avançar -->
+      <ion-button expand="block" type="submit" [disabled]="!f.valid" *ngIf="!emptyUnities">
+        Avançar
+      </ion-button>
+    </div>
+  </form>
+</ion-content>

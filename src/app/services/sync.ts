@@ -136,6 +136,7 @@ export class SyncProvider {
     return new Observable(observer => {
       this.verifyWifi().pipe(
         switchMap(continueSync => {
+          console.log(continueSync)
           if (continueSync) {
             return from(this.utilsService.hasAvailableStorage()).pipe(
               switchMap(available => {
@@ -158,6 +159,7 @@ export class SyncProvider {
                   contentRecordsToSync: from(this.storage.get('contentRecordsToSync'))
                 }).pipe(
                   switchMap(results => {
+                    console.log(results)
                     if (!results) {
                       observer.error();
                       observer.complete();
