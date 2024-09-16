@@ -45,6 +45,7 @@ import { ContentRecordsPersisterService } from './services/offline_data_persiste
 import { ContentRecordsService } from './services/content_records';
 import { TeachingPlansPersisterService } from './services/offline_data_persistence/teaching_plans_persister';
 import { TeachingPlansService } from './services/teaching_plans';
+import { DailyFrequencyStudentService } from './services/daily_frequency_student';
 
 @NgModule({
   declarations: [AppComponent],
@@ -91,7 +92,8 @@ import { TeachingPlansService } from './services/teaching_plans';
     ContentRecordsPersisterService,
     ContentRecordsService,
     TeachingPlansPersisterService,
-    TeachingPlansService],
+    TeachingPlansService,
+    DailyFrequencyStudentService],
   bootstrap: [AppComponent],
 })
 export class AppModule { }

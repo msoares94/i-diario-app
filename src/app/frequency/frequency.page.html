@@ -30,7 +30,7 @@
 
       <div class="form-item" *ngIf="classrooms.length > 0" id="frequency-classroom">
         <h3 class="form-item-title">Turma</h3>
-        <ion-list>
+        <ion-list> 
           <ion-radio-group [(ngModel)]="classroomId" name="classroom" (ionChange)="onChangeClassroom()" required>
             <ion-item class="form-item-radio-item" *ngFor="let classroom of classrooms" lines="none">
               <ion-label>{{ classroom.description }}</ion-label>
@@ -51,13 +51,13 @@
           </ion-radio-group>
         </ion-list>
       </div>
-
+ 
       <div class="form-item" *ngIf="!globalAbsence" id="frequency-classes">
         <h3 class="form-item-title">Aulas</h3>
         <ion-list class="itens-checkbox">
           <ion-item class="form-item-check-item" *ngFor="let class of classes;" lines="none">
             <ion-label class="form-item-check-item-label">{{ class }}ª</ion-label>
-            <ion-checkbox slot="start"
+            <ion-checkbox style="visibility: hidden;"
                           [checked]="selectedClasses.indexOf(class) > -1"
                           (ionChange)="updateSelectedClasses(class)">
             </ion-checkbox>

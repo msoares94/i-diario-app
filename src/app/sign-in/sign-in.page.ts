@@ -62,7 +62,7 @@ export class SignInPage implements OnInit {
       this.selectedCity = undefined;
       this.messages.showToast('Sem conexão!', 1000, 'top');
     } else {
-      this.getCustomers();
+      //this.getCustomers();
     }
   }
 
@@ -77,6 +77,7 @@ export class SignInPage implements OnInit {
   getCustomers() {
     this.customersService.getCustomers().subscribe(
       (data: Customer[]) => {
+        console.log(data)
         this.cities = data;
         this.cdr.detectChanges();
       });
@@ -97,14 +98,22 @@ export class SignInPage implements OnInit {
     this.auth.signIn(credential, password).subscribe(
       (user: User) => {
         console.log(user);
-        this.auth.setCurrentUser(user);
-        this.offlineDataPersister.persist(user).subscribe(res => {
-          console.log(res);
-        })
+        if (user) {
+          this.auth.setCurrentUser(user);
+          this.offlineDataPersister.persist(user).subscribe(res => {
+            console.log(res);
+          })
 
-        this.router.navigate([''], { queryParams: user });
+          this.router.navigate([''], { queryParams: user });
+        }else{
+          this.anyError = true;
+          this.errorMessage = " ";
+          loading.dismiss();
+        }
+
       },
       (error: any) => {
+        console.log(error)
         this.anyError = true;
         this.errorMessage = "Não foi possível efetuar login.";
         loading.dismiss();

@@ -6,12 +6,13 @@ import { Storage } from '@ionic/storage-angular';
 
 import { ConnectionService } from './connection';
 import { ApiService } from './api';
+import { StorageService } from './storage.service';
 
 @Injectable()
 export class ExamRulesService {
   constructor(
     private http: HttpClient,
-    private storage: Storage,
+    private storage: StorageService,
     private connection: ConnectionService,
     private api: ApiService
   ) {}
@@ -29,24 +30,21 @@ export class ExamRulesService {
     );
   }
 
-  getOfflineExamRules(classroomId: number): Observable<any> {
-    return new Observable(observer => {
-      from(this.storage.get('examRules')).subscribe((examRules: any[]) => {
-        if (!examRules) {
+  getOfflineExamRules(classroomId: number){
+    return new Observable((observer) => {
+      this.storage.get('examRules').then((examRules) => {
+        if (!examRules){
           observer.complete();
           return;
         }
 
-        for (const examRule of examRules) {
-          if (examRule.classroomId === classroomId) {
-            observer.next(examRule);
-            observer.complete();
-            return;
+        examRules.forEach((examRule: any) => {
+          if(examRule.classroomId == classroomId){
+            observer.next(examRule)
+            observer.complete()
           }
-        }
-
-        observer.complete();
-      });
-    });
+        })
+      })
+    })
   }
 }

@@ -31,7 +31,7 @@ export class OfflineDataPersisterService {
   ) {}
 
   private clearStorage(): void {
-    this.storage.remove('unities');
+    //this.storage.remove('unities');
     this.storage.remove('classrooms');
     this.storage.remove('disciplines');
     this.storage.remove('examRules');
@@ -42,9 +42,10 @@ export class OfflineDataPersisterService {
   }
 
   persist(user: User): Observable<void> {
-   /* if (this.connectionService.isOnline) {
-      //this.clearStorage();
-    }*/
+    console.log(user)
+   if (this.connectionService.isOnline) {
+      this.clearStorage();
+    }
  
     return concat(
       this.unitiesPersister.persist(user).pipe(catchError(() => of(void 0))),

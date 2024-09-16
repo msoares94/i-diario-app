@@ -1,21 +1,24 @@
 .page-content {
     background-color: #F0EBF8;
     height: 100%;
+    --padding-start: 15px;
+    --padding-end: 15px;
+
 }
 
-ion-title.title.title-ios{
-  padding: 0 12px;
+ion-title.title.title-ios {
+    padding: 0 12px;
 }
 
 .toolbar-title {
     font-size: 24px;
-    font-family: "NunitoBold";
+
     padding-right: 10px;
     overflow: visible;
 }
 
 .frequency-day {
-    font-family: "NunitoRegular";
+
     font-size: 18px;
     color: #868499;
     padding-left: 12px;
@@ -34,12 +37,13 @@ ion-title.title.title-ios{
 }
 
 .frequency-empty-today p {
-    font-family: "NunitoBold";
+
     font-size: 16px;
     color: #87878c;
     text-align: center;
     padding-top: 24px;
 }
+
 .empty-results {
     width: auto;
     height: 60pt;
@@ -50,15 +54,16 @@ ion-title.title.title-ios{
     text-align: center;
 
     .texto {
-        font-family: "NunitoBold";
+
         font-size: 14pt;
         color: #87878c;
         text-align: center;
         padding-top: 14pt;
     }
 }
+
 .accordion-list-item .view-eye {
-    font-family: "NunitoRegular";
+
     font-size: 16px;
     text-transform: uppercase;
     color: #3f3d4d;

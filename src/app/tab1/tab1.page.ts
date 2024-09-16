@@ -8,6 +8,7 @@ import { MessagesService } from '../services/messages';
 import { OfflineDataPersisterService } from '../services/offline_data_persistence/offline_data_persister';
 import { DailyFrequencyService } from '../services/daily_frequency';
 import { StorageService } from '../services/storage.service';
+import { GlobalFrequenciesPersisterService } from '../services/offline_data_persistence/global_frequencies_persister';
 
 
 @Component({
@@ -31,18 +32,30 @@ export class Tab1Page implements OnInit {
     private auth: AuthService,
     private utilsService: UtilsService,
     private storage: StorageService,
-    private messages: MessagesService
-  ) {}
+    private messages: MessagesService,
+    private global: GlobalFrequenciesPersisterService
+  ) { }
 
   async ngOnInit() {
-    this.utilsService.viewIsLeaving().subscribe(isLeaving => {
-      if (isLeaving) {
+   //this.storage.set('dailyFrequencyStudentsToSync', []);
+    const classroms = this.storage.get('classrooms');
+
+    this.storage.get('user').then(async res => {
+      console.log(res);
+      if(res){
+        const user = res;
+    
+        (await this.global.persist(await user, await classroms)).subscribe(res => {
+          console.log(res)
+        })
         this.loadFrequencies();
         this.frequenciesLoaded = true;
+        await this.sync.isSyncDelayed();
+      }else{
+        this.router.navigate(['/sign-in']);
       }
-    });
-
-    await this.sync.isSyncDelayed();
+    })
+    
   }
 
   ionViewWillEnter() {
@@ -52,17 +65,18 @@ export class Tab1Page implements OnInit {
     this.frequenciesLoaded = false;
   }
 
-  loadFrequencies() {  
+  loadFrequencies() {
     this.shownGroup = null;
     this.currentDate = this.utilsService.getCurrentDate();
     this.currentDate.setHours(0, 0, 0, 0);
     this.storage.get('frequencies').then((frequencies) => {
+      console.log(frequencies)
       if (frequencies) {
         this.lastFrequencyDays = this.lastTenFrequencies(frequencies.daily_frequencies);
         this.emptyFrequencies = false;
       } else {
         this.emptyFrequencies = true;
-       // this.currentDate = undefined;
+        this.currentDate = new Date();
       }
     });
   }
@@ -133,8 +147,8 @@ export class Tab1Page implements OnInit {
       classroomId: any;
       disciplineId: any;
       classroomName: any;
-      disciplineName: any; classNumbers: any[]; 
-}[] = [];
+      disciplineName: any; classNumbers: any[];
+    }[] = [];
 
     frequenciesOfUnity.forEach(frequency => {
       const indexOfClassroomDiscipline = classroomDisciplines.findIndex(cd => cd.classroomId === frequency.classroom_id && cd.disciplineId === frequency.discipline_id);
@@ -172,7 +186,7 @@ export class Tab1Page implements OnInit {
       this.storage.get('frequencies').then((frequencies) => {
         console.log(frequencies)
         if (frequencies) {
-          
+
           // Verifica se this.lastFrequencyDays está inicializado
           if (!this.lastFrequencyDays) {
             this.lastFrequencyDays = [];
@@ -187,7 +201,7 @@ export class Tab1Page implements OnInit {
       });
     });
   }
-  
+
 
   async editFrequency(unityId: number, classroomId: number, stringDate: string, disciplineId: number, classes: number[]) {
     const globalAbsence = !disciplineId;
@@ -196,10 +210,12 @@ export class Tab1Page implements OnInit {
     });
     this.loadingSync.present();
 
-    this.auth.currentUser().subscribe((user: { id: any; teacher_id: any; }) => {
+    this.auth.currentUser().subscribe(res => {
+      console.log(res);
+      const usuario = res;
       this.dailyFrequencyService.getStudents({
-        userId: user.id,
-        teacherId: user.teacher_id,
+        userId: usuario.id,
+        teacherId: usuario.teacher_id,
         unityId: unityId,
         classroomId: classroomId,
         frequencyDate: stringDate,
@@ -207,7 +223,17 @@ export class Tab1Page implements OnInit {
         classNumbers: classes ? classes.join() : ''
       }).subscribe(
         (result: any) => {
-          this.router.navigate(['/students-frequency-edit', { frequencies: result, global: globalAbsence }]);
+          console.log(result)
+          const navigationExtras = {
+            queryParams: {
+              //frequencies: result,
+              global: globalAbsence
+            },
+            state: {
+              result
+            }
+          };
+          this.router.navigate(['/students-frequency-edit'], navigationExtras);
         },
         (error: any) => {
           console.log(error);
@@ -216,10 +242,18 @@ export class Tab1Page implements OnInit {
           this.loadingSync.dismiss();
         }
       );
-    });
+
+    })
+
   }
 
   doRefresh() {
-    this.sync.syncAll().subscribe(() => this.loadFrequencies());
+    this.sync.syncAll().subscribe(res => {
+      this.loadFrequencies();
+      console.log(res);
+    })
+
+
+
   }
 }

@@ -7,22 +7,31 @@ import { Injectable } from '@angular/core';
 
 @Injectable()
 export class DisciplineFrequenciesPersisterService {
+  examRules: any;
   constructor(
     private classrooms: ClassroomsService,
     private storage: Storage,
     private frequencies: DailyFrequencyService
-  ) {}
+  ) {
+    this.storage.get('examRules').then(res => {
+      console.log(res);
+      this.examRules = res;
+    })
+  }
 
   private notEmptyDailyFrequencies(dailyFrequencies: any): boolean {
     return dailyFrequencies.data && dailyFrequencies.data.daily_frequencies && dailyFrequencies.data.daily_frequencies.length > 0;
   }
 
   persist(user: any, disciplines: any[]): Observable<any> {
-    return from(this.storage.get('examRules')).pipe(
+    return from(this.examRules).pipe(
       concatMap((examRule: any) => {
+        console.log(examRule)
         const frequenciesObservables = disciplines.flatMap(disciplineList =>
           disciplineList.data.map((discipline: { id: number; }) => {
-            const currentExamRule = examRule.find((rule: any) => rule.classroomId === disciplineList.classroomId);
+            
+            const currentExamRule = examRule;
+            console.log(currentExamRule)
             if (currentExamRule && (currentExamRule.data.exam_rule.frequency_type === "2" || currentExamRule.data.exam_rule.allow_frequency_by_discipline)) {
               return this.frequencies.getFrequencies(disciplineList.classroomId, discipline.id, user.teacher_id);
             } else {

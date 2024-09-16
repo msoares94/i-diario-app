@@ -29,24 +29,21 @@ export class DisciplinesService {
     );
   }
 
-  getOfflineDisciplines(classroomId: number): Observable<any> {
-    return new Observable(observer => {
-      from(this.storage.get('disciplines')).subscribe((disciplines: any[]) => {
-        if (!disciplines) {
+  getOfflineDisciplines(classroomId: number){
+    return new Observable((observer) => {
+      this.storage.get('disciplines').then((disciplines) => {
+        if (!disciplines){
           observer.complete();
           return;
         }
 
-        for (const discipline of disciplines) {
-          if (discipline.classroomId === classroomId) {
-            observer.next(discipline);
-            observer.complete();
-            return;
+        disciplines.forEach((discipline: any) => {
+          if(discipline.classroomId == classroomId){
+            observer.next(discipline)
+            observer.complete()
           }
-        }
-
-        observer.complete();
-      });
-    });
+        })
+      })
+    })
   }
 }

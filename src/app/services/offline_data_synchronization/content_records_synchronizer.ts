@@ -13,6 +13,7 @@ export class ContentRecordsSynchronizer {
   ){}
 
   public sync(contentRecords: any[], teacherId: number): Observable<any> {
+    console.log(contentRecords)
     return new Observable(observer => {
       if (contentRecords && contentRecords.length) {
         let contentRecordObservables = contentRecords.map(contentRecord => {

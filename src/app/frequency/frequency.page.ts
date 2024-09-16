@@ -17,6 +17,7 @@ import { UnitiesService } from '../services/unities';
 import { UtilsService } from '../services/utils';
 import { ActivatedRoute, Router } from '@angular/router';
 import { StorageService } from '../services/storage.service';
+import { catchError, finalize, of, tap } from 'rxjs';
 
 @Component({
   selector: 'app-frequency',
@@ -31,11 +32,11 @@ export class FrequencyPage implements OnInit {
   unities: Unity[] = [];
   unityId: number | undefined;
   classrooms: Classroom[] = [];
-  classroomId: number | undefined;
+  classroomId: number;
   date: any;
   globalAbsence = true;
   disciplines: any;
-  disciplineId!: number;
+  disciplineId!: number | undefined;
   classes: any;
   selectedClasses: any[] = [];
   emptyUnities = true;
@@ -59,7 +60,9 @@ export class FrequencyPage implements OnInit {
     private route: ActivatedRoute,
     private storage: StorageService,
     private router: Router,
-  ) { }
+  ) {
+    this.classroomId = 0
+  }
 
   async ngOnInit() {
     if (!this.date) {
@@ -92,7 +95,7 @@ export class FrequencyPage implements OnInit {
             this.schoolCalendarsService.getOfflineSchoolCalendar(this.unityId!).subscribe(
               (schoolCalendar: any) => {
                 this.resetSelectedValues();
-                this.classrooms = classrooms.data;
+                this.classrooms = classrooms.data[0];
                 loader.dismiss();
 
                 if (!schoolCalendar.data) {
@@ -121,47 +124,59 @@ export class FrequencyPage implements OnInit {
     });
   }
 
-  onChangeClassroom() {
+  async onChangeClassroom() {
     if (!this.classroomId) { return; }
-    //this.disciplineId = undefined;
 
-    const _classes = this.classes;
+    this.disciplineId = undefined;
+    console.log(this.classroomId);
+
+    // Evitar ExpressionChangedAfterItHasBeenCheckedError
+    let _classes = this.classes;
     this.classes = [];
     this.selectedClasses = [];
-    this.cdr.detectChanges();
+    this.cdr.detectChanges(); // Aviso: pode ser sintoma de outro problema
     this.classes = _classes;
 
-    this.showLoader('Carregando...').then(loader => {
-      this.auth.currentUser().subscribe(user => {
-        this.examRulesService.getOfflineExamRules(this.classroomId!).subscribe(
-          (result: any) => {
-            if (result.data.exam_rule && result.data.exam_rule.allow_frequency_by_discipline) {
-              this.disciplinesService.getOfflineDisciplines(this.classroomId!).subscribe(
-                (result: any) => {
-                  this.disciplines = result.data;
-                  this.globalAbsence = false;
-                  this.cdr.detectChanges();
-                  this.scrollTo("frequency-discipline");
-                  loader.dismiss();
-                },
-                error => {
-                  loader.dismiss();
-                }
-              );
-            } else {
-              this.globalAbsence = true;
-              loader.dismiss();
-              this.cdr.detectChanges();
-              this.scrollTo("frequency-date");
-            }
-          },
-          error => {
-            loader.dismiss();
-          }
-        );
-      });
+    const loader = await this.loadingCtrl.create({
+      message: "Carregando..."
     });
+    await loader.present();
+
+    this.examRulesService.getOfflineExamRules(this.classroomId).pipe(
+      tap((result: any) => {
+        console.log(result);
+
+        if (result.data.exam_rule && result.data.exam_rule.allow_frequency_by_discipline) {
+          console.log('oi')
+          this.disciplinesService.getOfflineDisciplines(this.classroomId).pipe(
+            tap((disciplineResult: any) => {
+              console.log(disciplineResult)
+              this.disciplines = disciplineResult.data;
+              this.globalAbsence = false;
+              this.cdr.detectChanges();
+              this.scrollTo("frequency-discipline");
+            }),
+            catchError((error) => {
+              console.log(error);
+              return of(null); // Retorna um Observable nulo para encerrar o fluxo
+            }),
+            finalize(() => loader.dismiss())
+          ).subscribe(); // É necessário o subscribe para ativar o fluxo do Observable
+        } else {
+          this.globalAbsence = true;
+          this.cdr.detectChanges();
+          this.scrollTo("frequency-date");
+          loader.dismiss();
+        }
+      }),
+      catchError((error) => {
+        console.log(error);
+        return of(null); // Retorna um Observable nulo para encerrar o fluxo
+      }),
+      //finalize(() => loader.dismiss())
+    ).subscribe();
   }
+
 
   onChangeDiscipline() {
     this.scrollTo("frequency-classes");
@@ -187,9 +202,19 @@ export class FrequencyPage implements OnInit {
           classNumbers: classes.join()
         }).subscribe(
           (result: any) => {
-            /*this.navCtrl.navigateForward(StudentsFrequencyPage, {
-              queryParams: { frequencies: result, global: this.globalAbsence }
-            });*/
+            console.log(result)
+            const navigationExtras = {
+              queryParams: {
+                frequencies: result,
+                global: this.globalAbsence
+              },
+              state: {
+                result
+                //callback: this.refreshPage.bind(this)
+              }
+            };
+            this.router.navigate(['/students-frequency-edit'], navigationExtras);
+
             loader.dismiss();
           },
           error => {
@@ -202,8 +227,8 @@ export class FrequencyPage implements OnInit {
 
   resetSelectedValues() {
     this.globalAbsence = true;
-    //this.classroomId = null;
-    //this.disciplineId = null;
+    //this.classroomId = undefined;
+    this.disciplineId = undefined;
     this.selectedClasses = [];
   }
 

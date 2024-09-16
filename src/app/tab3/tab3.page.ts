@@ -67,7 +67,7 @@ export class Tab3Page {
   }
 
   openDetail(lessonPlanId: number) { // Ajustado para tipagem adequada
-    this.navCtrl.navigateForward('/lesson-plan-details', { state: { lessonPlanId } }); // Atualizado para navigateForward
+    this.navCtrl.navigateForward('/lesson-plan-details', { state: { lessonPlanId } }); // Atualizado para navigateForward 
   }
 
   newFrequency() {

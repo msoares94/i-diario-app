@@ -4,7 +4,7 @@ Aplicativo para o professor com lançamento de frequência e registro de conteú
 
 ## Pré requisitos
 
-- node.js
+- node.js (20+)
 - npm
 
 
@@ -13,7 +13,7 @@ Aplicativo para o professor com lançamento de frequência e registro de conteú
 - Instalar a biblioteca do ionic
 
 ```bash
-$ npm install -g ionic
+$ npm install -g @ionic/cli
 ```
 
 - Baixar o i-Diário App:
@@ -37,7 +37,7 @@ $  ionic serve
 
 ## Publicações na loja do Android e iOS
 
-Seguir os passos na [documentação](https://ionicframework.com/docs/v1/guide/publishing.html) do framework
+Seguir os passos na [documentação](https://ionicframework.com/docs/angular/your-first-app/deploying-mobile) do framework
 
 ## Sincronização com i-Diário
 
@@ -45,17 +45,17 @@ Seguir os passos na [documentação](https://ionicframework.com/docs/v1/guide/pu
 - Realizar login com o professor no aplicativo
 - Clicar no ícone de sincronização
 
-# Primeira instalação MacOS
 
-Caso você esteja com a versão mais atual do `node`, `npm` e `node-gyp` é necessário instalar `npm install node-sass@4.12.0` para funcionar corretamente.
+# Build Capacitor
 
-Instalei a versão `4.12.12` do `node-sass` como dependência do projeto para evitar problemas futuros.
-
-
-# Build iOS
-
-Como o projeto é antigo, foi necessário adicionar a plataforma com uma versão maior do iOS
-
-> ionic cordova platform add ios@5.1.1
-
-Depois de adicionado, basta abrir o arquivo `platforms/ios/Portabilis Diário.xcodeproj` no XCode e assinar com o certificado correto em `Signing & Capabilities`
+```bash
+$  ionic build
+$  npx capacitor-assets generate
+$  ionic cap add ios
+$  ionic cap add android
+$  ionic cap copy
+$  ionic cap sync
+$  ionic cap open ios
+$  ionic cap open android
+```
+O projeto foi atualizado para   `@ionic/angular": "^7.0.0"` e `"@angular/common": "^17.0.2"`.

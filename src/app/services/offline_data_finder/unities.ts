@@ -12,6 +12,7 @@ export class OfflineUnityFinder {
   find(params: { unityId: any; }){
     return new Observable((observer) => {
       this.storage.get('unities').then((unities) => {
+        console.log(unities)
         if (params.unityId) {
           unities = unities.filter((unityId: { id: any; }) => {
             return unityId.id == params.unityId

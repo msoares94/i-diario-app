@@ -250,6 +250,7 @@ $toolbar-background: #6E00B5;
 ion-toolbar {
   --background: #6E00B5;
   --color: white;
+  --border-width: 0 !important;
 /*
   --border-color: #f24aec;
   --border-width: 4px 0;
@@ -261,4 +262,5 @@ ion-toolbar {
 }
 ion-content{
   --background: #F0EBF8;
+
 }

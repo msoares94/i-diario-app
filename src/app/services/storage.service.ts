@@ -16,8 +16,9 @@ export class StorageService {
     this._storage = store;
     //console.log(this._storage)
   }
-  public set(key: string, value: any) {
-
+  public async set(key: string, value: any) {
+    if(!this._storage)
+      await this.configDB() ;
       this._storage?.set(key, value);
     
 
@@ -26,5 +27,11 @@ export class StorageService {
     if(!this._storage)
             await this.configDB() ;
     return await this._storage?.get(key);
+  }
+
+  public async remove(key: string) {
+    if(!this._storage)
+            await this.configDB() ;
+    return await this._storage?.remove(key);
   }
 }

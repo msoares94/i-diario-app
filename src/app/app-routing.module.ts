@@ -33,6 +33,18 @@ const routes: Routes = [
   {
     path: 'new-content-record-form',
     loadChildren: () => import('./new-content-record-form/new-content-record-form.module').then( m => m.NewContentRecordFormPageModule)
+  },
+  {
+    path: 'content-record-form',
+    loadChildren: () => import('./content-record-form/content-record-form.module').then( m => m.ContentRecordFormPageModule)
+  },
+  {
+    path: 'students-frequency-edit',
+    loadChildren: () => import('./students-frequency-edit/students-frequency-edit.module').then( m => m.StudentsFrequencyEditPageModule)
+  },
+  {
+    path: 'lesson-plan-details',
+    loadChildren: () => import('./lesson-plan-details/lesson-plan-details.module').then( m => m.LessonPlanDetailsPageModule)
   }
   
 ];

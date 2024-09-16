@@ -29,7 +29,8 @@ export class InterceptService implements HttpInterceptor {
         'Access-Token': accessToken
       })
     });
-    //console.log(authReq)
+    console.log(authReq)
+    console.log(accessToken)
     // Envie a solicitação com os cabeçalhos atualizados
     return next.handle(authReq);
   }

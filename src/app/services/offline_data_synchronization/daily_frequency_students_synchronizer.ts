@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable, from, concat } from 'rxjs';
-import { concatMap, map } from 'rxjs/operators';
+import { Observable, from, forkJoin } from 'rxjs';
+import { concatMap, catchError, map } from 'rxjs/operators';
 import { Storage } from '@ionic/storage-angular';
 import { ApiService } from '../api';
 import { AuthService } from '../auth';
@@ -16,56 +16,64 @@ export class DailyFrequencyStudentsSynchronizer {
   ) {}
 
   public sync(dailyFrequencyStudents: any[]): Observable<any> {
-    console.log(dailyFrequencyStudents)
-    return new Observable(observer => {
-      if (dailyFrequencyStudents) {
-        
-        this.auth.currentUser().pipe(
-          concatMap(user => {
-            const requests = dailyFrequencyStudents.map(dailyFrequencyStudent => {
-              return this.http.post(this.api.getDailyFrequencyStudentsUpdateOrCreateUrl(), {
-                present: dailyFrequencyStudent.present,
-                user_id: dailyFrequencyStudent.userId,
-                classroom_id: dailyFrequencyStudent.classroomId,
-                discipline_id: dailyFrequencyStudent.disciplineId,
-                student_id: dailyFrequencyStudent.studentId,
-                class_number: dailyFrequencyStudent.classNumber,
-                frequency_date: dailyFrequencyStudent.frequencyDate,
-                teacher_id: user.teacher_id
-              });
-            });
-            return concat(...requests);
-          })
-        ).subscribe(
-          result => observer.next(result),
-          error => observer.error(error),
-          () => {
-            //this.deleteFrequencies(dailyFrequencyStudents);
-            let freq: never[] = [];
-            this.storage.set('dailyFrequencyStudentsToSync', freq);
-            observer.complete();
-          }
-        );
-      } else {
-        observer.complete();
-      }
-    });
-  } 
+    console.log(dailyFrequencyStudents);
+    if (!dailyFrequencyStudents || dailyFrequencyStudents.length === 0) {
+      return new Observable(observer => observer.complete());
+    }
 
-  private deleteFrequencies(dailyFrequencyStudents: any[]) {
-    from(this.storage.get('dailyFrequencyStudentsToSync')).subscribe(localDailyFrequencyStudents => {
-      console.log(localDailyFrequencyStudents);
-      const newDailyFrequencyStudents = localDailyFrequencyStudents.filter((localDailyFrequencyStudent: any)  => {
-        return !dailyFrequencyStudents.some((dailyFrequencyStudent: any) =>
-          this.isSameDailyFrequencyStudent(dailyFrequencyStudent, localDailyFrequencyStudent)
-        );
-      });
+    return this.auth.currentUser().pipe(
+      concatMap(user => {
+        const requests = dailyFrequencyStudents.map(dfs => {
+          return this.http.post(this.api.getDailyFrequencyStudentsUpdateOrCreateUrl(), {
+            present: dfs.present,
+            user_id: dfs.userId,
+            classroom_id: dfs.classroomId,
+            discipline_id: dfs.disciplineId,
+            student_id: dfs.studentId,
+            class_number: dfs.classNumber,
+            frequency_date: dfs.frequencyDate,
+            teacher_id: user.teacher_id
+          }).pipe(
+            catchError(error => {
+              console.error('Erro ao sincronizar dailyFrequencyStudent:', dfs, error);
+              return from([]); // retorna um observable vazio em caso de erro para continuar a execução
+            })
+          );
+        });
 
-      this.storage.set('dailyFrequencyStudentsToSync', newDailyFrequencyStudents);
-    });
+        return forkJoin(requests);
+      }),
+      concatMap(() => {
+        // Limpar as frequências sincronizadas após o sucesso
+        return this.clearSyncedFrequencies();
+      }),
+      catchError(error => {
+        console.error('Erro durante a sincronização:', error);
+        return from([]); // Em caso de erro geral, continuar o fluxo
+      })
+    );
   }
 
-  private isSameDailyFrequencyStudent(dfs1: any, dfs2: any) {
+  private clearSyncedFrequencies(): Observable<any> {
+    return from(this.storage.set('dailyFrequencyStudentsToSync', []));
+  }
+
+  private deleteFrequencies(dailyFrequencyStudents: any[]): void {
+    from(this.storage.get('dailyFrequencyStudentsToSync')).pipe(
+      map(localDailyFrequencyStudents => {
+        if (!localDailyFrequencyStudents) return [];
+
+        return localDailyFrequencyStudents.filter((localDfs: any) => {
+          return !dailyFrequencyStudents.some((dfs: any) =>
+            this.isSameDailyFrequencyStudent(dfs, localDfs)
+          );
+        });
+      }),
+      concatMap(newDailyFrequencyStudents => this.storage.set('dailyFrequencyStudentsToSync', newDailyFrequencyStudents))
+    ).subscribe();
+  }
+
+  private isSameDailyFrequencyStudent(dfs1: any, dfs2: any): boolean {
     return (
       dfs1.classNumber === dfs2.classNumber &&
       dfs1.classroomId === dfs2.classroomId &&

@@ -28,7 +28,9 @@ export class Tab2Page {
     private storage: StorageService,
     private utilsService: UtilsService,
     private messages: MessagesService,
-    private router: Router
+    private router: Router,
+    
+
   ) {}
 
   ionViewWillEnter() {
@@ -211,11 +213,11 @@ export class Tab2Page {
         classroomName: classroomName,
         unityName: unityName
       },
-      state: {
-        callback: this.refreshPage.bind(this)
+      state: { 
+        //callback: this.refreshPage.bind(this)
       }
     };
-  
+   
     this.router.navigate(['/content-record-form'], navigationExtras);
   }
 

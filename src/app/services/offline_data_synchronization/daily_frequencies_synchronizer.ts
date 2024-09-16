@@ -16,6 +16,7 @@ export class DailyFrequenciesSynchronizer {
   ){}
 
   public sync(dailyFrequencies: any[]): Observable<any> {
+    console.log(dailyFrequencies)
     return new Observable(observer => {
       if (dailyFrequencies) {
         this.auth.currentUser().subscribe(user => {

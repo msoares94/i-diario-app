@@ -1,0 +1,33 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-back-button (click)="goBack()" defaultHref="/"></ion-back-button>
+    </ion-buttons>
+    <ion-title>
+      <p class="title-content-record">{{ displayDate }}</p>
+      <p class="content-record-unity-name">{{ contentRecord.unity_name }}</p>
+    </ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <div class="details-panel">
+    <p class="content-record-description">{{ contentRecord.description }} - {{ contentRecord.classroom_name }}</p>
+
+    <ion-list>
+      <ion-item *ngFor="let content of contents">
+        <ion-label>{{ content.description }}</ion-label>
+        <ion-checkbox [(ngModel)]="content.checked" slot="end"></ion-checkbox>
+      </ion-item>
+
+      <ion-item>
+        <ion-input
+          [(ngModel)]="newContent"
+          name="newContent"
+          placeholder="Adicionar item..."
+          (change)="addContent()" >
+        </ion-input>
+      </ion-item>
+    </ion-list>
+  </div>
+</ion-content>

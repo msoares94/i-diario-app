@@ -17,9 +17,9 @@ export class UnitiesPersisterService {
     private storage: StorageService
   ) {
     this.unities.getOnlineUnities(148).subscribe(res => {
-      console.log(res)
-      this.storage.set('unities', res)
-    })
+     console.log(res)
+     //this.storage.set('unities', res)
+   })
   }
 
   persist(user: User): Observable<any> {

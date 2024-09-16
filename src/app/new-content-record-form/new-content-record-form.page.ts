@@ -50,7 +50,7 @@ export class NewContentRecordFormPage implements OnInit {
 
     this.classroomsService.getOfflineClassrooms(this.unityId).subscribe(
       (classrooms: any) => {
-        this.classrooms = classrooms.data;
+        this.classrooms = classrooms.data[0];
       },
       (error) => {
         console.log(error);
@@ -58,7 +58,7 @@ export class NewContentRecordFormPage implements OnInit {
     );
   }
 
-  onChangeClassroom() {
+  onChangeClassroom() { 
     if (!this.classroomId) return;
 
     this.disciplineId = null;

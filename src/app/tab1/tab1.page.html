@@ -29,13 +29,13 @@
         <div class="accordion-list-border">
           <ion-list class="accordion-list"
                     *ngFor="let unity of frequencyDay.unities; let y=index">
-            <ion-item-divider class="accordion-list-header"
+            <ion-item class="accordion-list-header"
                                no-lines
                                text-wrap
                                (click)="toggleGroup(i+''+y)"
                                [ngClass]="{active: isGroupShown(i+''+y)}">
               <p>{{unity.name}}</p>
-            </ion-item-divider>
+            </ion-item>
 
             <div *ngFor="let classroomDiscipline of unity.classroomDisciplines;">
               <ion-item (click)="editFrequency(unity.id, classroomDiscipline.classroomId, frequencyDay.date, classroomDiscipline.disciplineId, classroomDiscipline.classNumbers)" *ngIf="isGroupShown(i+''+y)" class="accordion-list-item accordion-list-item-frequency-index" >

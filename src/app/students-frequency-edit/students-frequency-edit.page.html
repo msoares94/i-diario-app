@@ -1,0 +1,67 @@
+<ion-header>
+  <ion-toolbar mode="md">
+    <ion-buttons slot="start">
+      <ion-back-button defaultHref="" (click)="goBack()"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+  <div class="multiple-lines">
+    <img class="students-frequency-edit-img edit-img"
+      src="assets/img/students-frequency-edit/ilustraFrequencia@2x.png" />
+    <p class="title-students-frequency-edit" text-center>Lista de Frequência</p>
+    <p class="unity-name-students-frequency-edit" text-center>{{ unityName }}</p>
+    <p class="date-students-frequency-edit" text-center>{{ formatDate }}</p>
+  </div>
+
+</ion-header>
+
+<ion-content class="page-content" id="students-frequency-edit-page">
+  <h3 class="content-page-section">Detalhes da Chamada</h3>
+  <div class="details-panel">
+    <div class="detail">
+      <h3 class="detail-title">Turma</h3>
+      <p class="detail-text">{{ classroomName }}</p>
+    </div>
+    <div class="detail" *ngIf="disciplineName">
+      <h3 class="detail-title">Disciplina</h3>
+      <p class="detail-text">{{ disciplineName }}</p>
+    </div>
+  </div>
+
+  <h3 class="content-page-section">Lista de Presença</h3>
+
+
+  <ion-grid class="grid">
+    <ion-row class="grid-row" *ngFor="let student of students">
+      <ion-col>
+        <div class="student-name" text-left>
+          {{ student.name || student.student.name }}
+        </div>
+
+
+        <ion-list *ngIf="!globalAbsence" class="frequency-checkbox">
+          <ion-item *ngFor="let frequency of student.frequencies; let i = index" class="frequency-checkbox-item" lines="none">
+            <ion-label class="frequency-checkbox-item-label">{{ classes[i] }}ª</ion-label>
+            <ion-checkbox [(ngModel)]="frequency.present" (ionChange)="updateFrequency(frequency, classes[i], $event.detail.checked)"></ion-checkbox>
+          </ion-item>
+        </ion-list>
+        
+
+
+        <ion-list *ngIf="globalAbsence" class="frequency-checkbox">
+          <ion-radio-group [(ngModel)]="student.present" (ionChange)="updateFrequency(student)">
+            <ion-item class="global-frequency global-frequency-present">
+              <ion-label>Presente</ion-label>
+              <ion-radio value="true"></ion-radio>
+            </ion-item>
+            <ion-item class="global-frequency global-frequency-absent">
+              <ion-label>Faltou</ion-label>
+              <ion-radio value="false"></ion-radio>
+            </ion-item>
+          </ion-radio-group>
+        </ion-list>
+        
+
+      </ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>
