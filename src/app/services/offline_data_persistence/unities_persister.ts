@@ -16,28 +16,34 @@ export class UnitiesPersisterService {
     private schoolCalendarsPersister: SchoolCalendarsPersisterService,
     private storage: StorageService
   ) {
-    this.unities.getOnlineUnities(148).subscribe(res => {
-     console.log(res)
-     //this.storage.set('unities', res)
-   })
+    this.storage.get('user').then(res => {
+      console.log(res)
+      if (res) {
+        this.unities.getOnlineUnities(res.teacher_id).subscribe(res => {
+          console.log(res)
+          this.storage.set('unities', res)
+        })
+      }
+    })
+
   }
 
   persist(user: User): Observable<any> {
     console.log(user)
     return this.unities.getOnlineUnities(user.teacher_id)
-    .pipe(
-      concatMap((unities) =>
-        forkJoin([
-          this.classroomsPersister.persist(user, unities),
-          this.schoolCalendarsPersister.persist(user, unities)
-        ]).pipe(
-          concatMap(() => this.storage.set('unities', unities)!),
-          catchError(error => {
-            console.error(error);
-            throw error; // Propaga o erro para o Observable principal
-          })
+      .pipe(
+        concatMap((unities) =>
+          forkJoin([
+            this.classroomsPersister.persist(user, unities),
+            this.schoolCalendarsPersister.persist(user, unities)
+          ]).pipe(
+            concatMap(() => this.storage.set('unities', unities)!),
+            catchError(error => {
+              console.error(error);
+              throw error; // Propaga o erro para o Observable principal
+            })
+          )
         )
-      )
-    );
+      );
   }
 }

@@ -19,12 +19,12 @@ import { OfflineDataPersisterService } from '../services/offline_data_persistenc
 })
 export class SignInPage implements OnInit {
   cities: Customer[] = [
-    { name: 'Treinamento', url: 'https://treinamento.idiario.net.br', support_url: '' }
+    { name: 'i-Diário', url: 'http://localhost:3000', support_url: '' },
   ];
   anyError: boolean = false;
   errorMessage: string = "";
   selectedCity: Customer | undefined;
-  isOnline: boolean = false;
+  isOnline: boolean = true;
   supportUrl: string = "";
 
   credentials: string = "";
@@ -45,11 +45,12 @@ export class SignInPage implements OnInit {
     private offlineDataPersister: OfflineDataPersisterService
   ) { }
 
-  ngOnInit(): void {
-    // Método ngOnInit removido, pois não estava implementado e não era necessário
+  async ngOnInit(): Promise<void> {
     this.isOnline = this.connection.isOnline;
-    this.changeInputMunicipios(this.isOnline);
-    this.connection.eventOnline.subscribe((online: boolean) => this.changeInputMunicipios(online));
+    await this.connection.eventOnline.subscribe((online: boolean) =>{
+      console.log(online)
+      this.changeInputMunicipios(online)
+    } );
   }
 
   ionViewWillEnter() {
@@ -57,6 +58,7 @@ export class SignInPage implements OnInit {
   }
 
   changeInputMunicipios(online: boolean) {
+    console.log(online)
     this.isOnline = online;
     if (!this.isOnline) {
       this.selectedCity = undefined;
