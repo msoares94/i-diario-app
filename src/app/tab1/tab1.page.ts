@@ -70,7 +70,7 @@ export class Tab1Page implements OnInit {
     this.currentDate = this.utilsService.getCurrentDate();
     this.currentDate.setHours(0, 0, 0, 0);
     this.storage.get('frequencies').then((frequencies) => {
-      console.log(frequencies)
+      console.log(frequencies);
       if (frequencies) {
         this.lastFrequencyDays = this.lastTenFrequencies(frequencies.daily_frequencies);
         this.emptyFrequencies = false;
@@ -104,7 +104,7 @@ export class Tab1Page implements OnInit {
 
   private lastTenFrequencies(frequencies: any[]) {
     const lastDays = [];
-    const frequencyLimit = 10;
+    const frequencyLimit = 30;
 
     for (let i = frequencyLimit; i > 0; i--) {
       const shortDate = this.utilsService.toStringWithoutTime(this.currentDate);
@@ -118,7 +118,7 @@ export class Tab1Page implements OnInit {
       });
       this.currentDate.setDate(this.currentDate.getDate() - 1);
     }
-
+    console.log(lastDays)
     return lastDays;
   }
 

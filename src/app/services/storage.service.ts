@@ -34,4 +34,8 @@ export class StorageService {
             await this.configDB() ;
     return await this._storage?.remove(key);
   }
+
+  public async clear() {
+    await this._storage?.clear();
+  }
 }

@@ -3,6 +3,7 @@ import { Router } from '@angular/router';
 import { Storage } from '@ionic/storage-angular';
 import { Device } from '@capacitor/device';
 import { environment } from '../../environments/environment';
+import { StorageService } from '../services/storage.service';
 
 
 @Component({
@@ -16,10 +17,10 @@ export class Tab5Page implements OnInit {
   minor_version!: string;
   public user_email!: string;
   public user_full_name!: string;
-  public device! : any;
+  public device!: any;
   public carregou: boolean = false;
 
-  constructor(private storage: Storage, private router: Router,) { 
+  constructor(private storage: StorageService, private router: Router,) {
     this.storage.get('user').then((user) => {
       //console.log(user);
       this.user_email = user.email;
@@ -31,19 +32,23 @@ export class Tab5Page implements OnInit {
     this.app_version = environment.appversion;
     await Device.getInfo().then(res => {
       console.log(res);
-      if(res){
+      if (res) {
         this.device = res;
         this.carregou = true;
       }
     });
-    
+
     console.log(this.device);
   }
 
   logout() {
-   
-    this.storage.clear();
-    this.router.navigate(['/sign-in']);
+
+    this.storage.clear().then(res => {
+      console.log(res);
+    }).finally(() => {
+      this.router.navigate(['/sign-in']);
+    });
+
   }
 
 }
